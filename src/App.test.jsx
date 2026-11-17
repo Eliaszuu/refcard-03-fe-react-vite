@@ -20,7 +20,7 @@ function renderApp() {
 
 test("renders the business trips application", () => {
   renderApp();
-  expect(screen.getByRole("heading", {name: "Business Trips"})).toBeInTheDocument();
+  expect(screen.getByRole("heading", {name: "Business Trips", level: 1})).toBeInTheDocument();
   expect(screen.getByRole("heading", {name: /My Wishlist/})).toBeInTheDocument();
 });
 
