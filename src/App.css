@@ -1,6 +1,67 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+.app-shell {
+  max-width: 1120px;
+  min-height: 100vh;
+  padding-top: 2.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.app-header {
+  padding: 2.25rem 2.5rem;
+  margin-bottom: 2rem;
+  color: #fff;
+  background: linear-gradient(120deg, #123b55, #176b70);
+  border-radius: 1rem;
+  box-shadow: 0 1rem 2.5rem rgb(18 59 85 / 15%);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.app-eyebrow {
+  margin-bottom: 0.5rem;
+  color: #b9e8dc;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.app-intro {
+  max-width: 38rem;
+  margin: 0.75rem 0 0;
+  color: rgb(255 255 255 / 85%);
+}
+
+.app-shell main > section {
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid #e8edf0;
+  border-radius: 0.9rem;
+  box-shadow: 0 0.5rem 1.5rem rgb(18 59 85 / 5%);
+}
+
+.app-shell footer {
+  padding-top: 1rem;
+  color: #687780;
+  font-size: 0.85rem;
   text-align: center;
+}
+
+@media (max-width: 575.98px) {
+  .app-shell {
+    padding-top: 1rem;
+  }
+
+  .app-header {
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .app-shell main > section {
+    padding: 1rem;
+  }
 }

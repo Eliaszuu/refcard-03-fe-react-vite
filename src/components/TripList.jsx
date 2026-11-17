@@ -10,19 +10,59 @@ const imgsFolder = import.meta.env.VITE_IMGS || "items";
 
 function TripList() {
     const [trips, setTrips] = useState([]);
+    const [status, setStatus] = useState("loading");
+    const [error, setError] = useState("");
+    const [retryCount, setRetryCount] = useState(0);
 
     useEffect(() => {
-        getBusinessTrips().then((response) => setTrips(response));
-    }, []);
+        const controller = new AbortController();
+        let isCurrentRequest = true;
+
+        getBusinessTrips({signal: controller.signal})
+            .then((response) => {
+                if (!isCurrentRequest) return;
+                setTrips(response);
+                setError("");
+                setStatus("success");
+            })
+            .catch((requestError) => {
+                if (!isCurrentRequest || requestError?.name === "AbortError") return;
+                setError(requestError instanceof Error ? requestError.message : "Unable to load business trips.");
+                setStatus("error");
+            });
+
+        return () => {
+            isCurrentRequest = false;
+            controller.abort();
+        };
+    }, [retryCount]);
 
     return (
         <section className="my-4">
             <div className="d-flex align-items-center justify-content-between mb-3">
                 <h4 className="mb-0">Business Trips</h4>
-                <span className="badge text-bg-secondary">{trips.length} available</span>
+                <span className="badge text-bg-secondary">
+                    {status === "loading" ? "Loading" : status === "error" ? "Unavailable" : `${trips.length} available`}
+                </span>
             </div>
 
-            {trips.length === 0 ? (
+            {status === "loading" ? (
+                <p className="alert alert-info" role="status">Loading business trips...</p>
+            ) : status === "error" ? (
+                <div className="alert alert-danger d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2" role="alert">
+                    <span>{error}</span>
+                    <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger align-self-start"
+                        onClick={() => {
+                            setStatus("loading");
+                            setRetryCount((count) => count + 1);
+                        }}
+                    >
+                        Retry
+                    </button>
+                </div>
+            ) : trips.length === 0 ? (
                 <p className="alert alert-info">No business trips available at the moment.</p>
             ) : (
                 <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">

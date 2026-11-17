@@ -1,40 +1,65 @@
-# React + Vite
+# Business Trips – Frontend
 
-## Getting the starting point
+React + Vite frontend for the RefCard05 business-trips application. The app
+loads trips from the Spring Boot API and stores the wishlist in the browser.
 
-**Option A — fresh clone at the starting point**
+## Local development
 
 ```bash
-git clone --branch v1-start https://github.com/bbwlc/refcard-03-fe-react-vite.git
-cd refcard-03-fe-react-vite
-npm install
+npm ci
 npm run dev
 ```
 
-**Option B — you already have the repo cloned**
+By default, the frontend calls `http://localhost:8080/v1/trips`. To use another
+backend, create `.env.local` in the repository root:
 
-```bash
-git fetch --tags
-git checkout v1-start
-npm install
-npm run dev
+```dotenv
+VITE_API_BASE_URL=http://localhost:8080/
+VITE_IMGS=items
 ```
 
-This puts you in a "detached HEAD" state at the tag — fine for exploring, but if you'll commit your own work, branch off it first:
+`VITE_API_BASE_URL` is the backend base URL, not a secret. Vite compiles it into
+the frontend at build time, so changing it for ECS requires a new image.
+
+Run checks and create a production build with:
 
 ```bash
-git checkout -b my-work v1-start
+npm test
+npm run lint
+npm run build
 ```
 
-> The app calls a backend at `http://localhost:8080/v1/trips` (see the `RefCard-03-be-SpringBootBusinessTrips` project), so make sure that's running too for the trip list / wishlist to show real data.
+## GitHub Actions and AWS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Pull requests run tests, lint, and the production build. A push to `main`
+additionally publishes a commit-SHA image and `latest` to ECR, then deploys it
+to ECS. Pushing a version tag such as `v1.2.0` publishes that exact tag and
+deploys the matching image. Version tags do not move `latest`.
 
-Currently, two official plugins are available:
+Configure these GitHub Actions repository variables for your AWS resources:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| Variable | Purpose |
+| --- | --- |
+| `VITE_API_BASE_URL` | Public base URL of the deployed backend |
+| `VITE_IMGS` | Image folder in the frontend assets; defaults to `items` |
+| `AWS_REGION` | AWS region; defaults to `us-east-1` |
+| `ECR_REPOSITORY` | Frontend ECR repository; defaults to `biztrips` |
+| `ECS_CLUSTER` | ECS cluster; defaults to `biztrips-cluster` |
+| `ECS_SERVICE` | Frontend ECS service; defaults to `biztrips-service` |
+| `ECS_CONTAINER_NAME` | Container name in the task definition; defaults to `biztrips` |
 
-## Expanding the ESLint configuration
+For AWS Academy Learner Lab, add the current session values as repository
+secrets: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and
+`AWS_SESSION_TOKEN`. Refresh them whenever the lab session expires. The
+`executionRoleArn` in `task-definition.json` must also refer to the
+`LabRole` in your account. Do not commit credentials.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Create and push a version tag to publish a release:
+
+```bash
+git tag v1.2.0
+git push origin v1.2.0
+```
+
+The Docker image serves the Vite build through nginx on port 80. The ECS task
+definition and service must use that container port.

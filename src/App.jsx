@@ -3,39 +3,22 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import Wishlist from "./components/Wishlist";
 import TripList from "./components/TripList";
-import {useWishlist} from "./components/wishlistContext.jsx";
 
 export default function App() {
     return (
-        <div className="container">
-            <header className="container h3">
-                RefCard 03 - Business Trips - Frontend Development with React and Java Spring
-
+        <div className="app-shell container">
+            <header className="app-header">
+                <p className="app-eyebrow">Travel planning</p>
+                <h1>Business Trips</h1>
+                <p className="app-intro">
+                    Explore upcoming business trips and save the ones you are interested in.
+                </p>
             </header>
-            <Wishlist/>
-            <TripList/>
-            <WishlistTest/>
+            <main>
+                <Wishlist/>
+                <TripList/>
+            </main>
             <footer>only for educational purposes @BBW 2026</footer>
-        </div>
-
-
-    );
-}
-
-function WishlistTest() {
-    const {wishlist} = useWishlist()
-    return (
-        <div className="container">
-            <header className="container h3">Wishlist-Test</header>
-            <ul className="list-unstyled">
-                {wishlist.map((item) => {
-                    return (
-                        <li key={item.id}>
-                            {item.id} - {item.title} {item.description}
-                        </li>
-                    );
-                })}
-            </ul>
         </div>
     );
 }
